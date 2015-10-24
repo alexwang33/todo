@@ -38,10 +38,45 @@ define(['util', 'selector'], function (util, $) {
             localStorage.task = taskText;
         }
 
-        cate = JSON.parse(localStorage.cate);
-        childCate = JSON.parse(localStorage.childCate);
-        task = JSON.parse(localStorage.task);
+        // cate = JSON.parse(localStorage.cate);
+        // childCate = JSON.parse(localStorage.childCate);
+        // task = JSON.parse(localStorage.task);
         isMobile = navigator.userAgent.match(/(iPhone|iPod|Android|ios|iPad)/i);
+
+        
+        util.ajax(
+            '/Backend/Task/Index/get_cate_farther.html', {
+                onsuccess: function (responseText, xhr) {
+                    // console.log(responseText, xhr);
+                    cate = JSON.parse(responseText);
+                },
+                onfail : function () {
+                    console.log('fail');
+                }
+            }
+        );
+        util.ajax(
+            '/Backend/Task/Index/get_cate_child.html', {
+                onsuccess: function (responseText, xhr) {
+                    // console.log(responseText, xhr);
+                    childCate = JSON.parse(responseText);
+                },
+                onfail : function () {
+                    console.log('fail');
+                }
+            }
+        );
+        util.ajax(
+            '/Backend/Task/Index/get_task.html', {
+                onsuccess: function (responseText, xhr) {
+                    // console.log(responseText, xhr);
+                    task = JSON.parse(responseText);
+                },
+                onfail : function () {
+                    console.log('fail');
+                }
+            }
+        );
 
         util.addClick($('#type-all'), typeClick);
         util.addClick($('.add'), newType);
@@ -392,7 +427,8 @@ define(['util', 'selector'], function (util, $) {
                 myEle[i].style.display = 'none';
             }
             for (i = 0; i < myEle.length; i++) {
-                if (myEle[i].classList.contains('task-finish') && myEle[i].parentNode.classList.contains('item')) {
+                console.log(myEle[i]);
+                if (!myEle[i].classList.contains('task-finish')) {
                     myEle[i].style.display = 'block';
                     myEle[i].parentElement.parentElement.style.display = 'block';
                 }
@@ -765,5 +801,5 @@ define(['util', 'selector'], function (util, $) {
     return {
         init: init,
         makeType: makeType
-    }
+    };
 });

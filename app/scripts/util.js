@@ -23,7 +23,7 @@ define(function() {
     }
 
     function addClick(elements, listener) {
-        if (elements.length) {
+        if (elements.length || elements.length === 0) {
             for (var i = 0; i < elements.length; i++) {
                 elements[i].addEventListener('click', listener);
             }
@@ -36,9 +36,70 @@ define(function() {
         }
     }
 
+    function ajax(url, options) {
+        // 创建对象
+        var xmlhttp;
+        if (window.XMLHttpRequest) {
+            xmlhttp = new XMLHttpRequest();
+        }
+        else {        //兼容 IE5 IE6
+            xmlhttp = new ActiveXObject('Microsoft.XMLHTTP');
+        }
+
+        // readyState
+        xmlhttp.onreadystatechange = function () {
+            if (xmlhttp.readyState === 4) {
+                if (xmlhttp.status >= 200 && xmlhttp.status < 300 || xmlhttp.status === 304) {
+                    if (options.onsuccess) {
+                        options.onsuccess(xmlhttp.responseText, xmlhttp.responseXML);
+                    }
+                }
+                else {
+                    if (options.onfail) {
+                        options.onfail();
+                    }
+                }
+            }
+        };
+
+        // 处理data
+        if (options.data) {
+            var dataarr = [];
+            for (var item in options.data) {
+                dataarr.push(item + '=' + encodeURI(options.data[item]));
+            }
+            var data = dataarr.join('&');
+        }
+
+        // 处理type
+        if (!options.type) {
+            options.type = 'GET';
+        }
+        options.type = options.type.toUpperCase();
+
+        // 发送请求
+        if (options.type === 'GET') {
+            var myURL = '';
+            if (options.data) {
+                myURL = url + '?' + data;
+            }
+            else {
+                myURL = url;
+            }
+            xmlhttp.open('GET', myURL, true);
+            xmlhttp.send();
+        }
+        else if (options.type === 'POST') {
+            xmlhttp.open('POST', url, true);
+            xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xmlhttp.send(data);
+        }
+    }
+
     return {
         uniqArray: uniqArray,
         htmlEncode: htmlEncode,
-        addClick: addClick
+        addClick: addClick,
+        ajax: ajax
     }
 });
